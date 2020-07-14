@@ -20,6 +20,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import horovod.tensorflow as hvd
 
 
 class PretrainingConfig(object):
@@ -49,7 +50,7 @@ class PretrainingConfig(object):
     self.num_train_steps = 1000000
     self.num_eval_steps = 100
     self.keep_checkpoint_max = 5 # maximum number of recent checkpoint files to keep;
-                                 # change to 0 or None to keep all checkpoints
+    # change to 0 or None to keep all checkpoints
 
     # model settings
     self.model_size = "small"  # one of "small", "base", or "large"
@@ -57,8 +58,8 @@ class PretrainingConfig(object):
     # modeling.BertConfig for the possible hparams and util.training_utils for
     # the defaults
     self.model_hparam_overrides = (
-        kwargs["model_hparam_overrides"]
-        if "model_hparam_overrides" in kwargs else {})
+      kwargs["model_hparam_overrides"]
+      if "model_hparam_overrides" in kwargs else {})
     self.embedding_size = None  # bert hidden size by default
     self.vocab_size = 30522  # number of tokens in the vocabulary
     self.do_lower_case = True  # lowercase the input?
@@ -66,13 +67,13 @@ class PretrainingConfig(object):
     # generator settings
     self.uniform_generator = False  # generator is uniform at random
     self.untied_generator_embeddings = False  # tie generator/discriminator
-                                              # token embeddings?
+    # token embeddings?
     self.untied_generator = True  # tie all generator/discriminator weights?
     self.generator_layers = 1.0  # frac of discriminator layers for generator
     self.generator_hidden_size = 0.25  # frac of discrim hidden size for gen
     self.disallow_correct = False  # force the generator to sample incorrect
-                                   # tokens (so 15% of tokens are always
-                                   # fake)
+    # tokens (so 15% of tokens are always
+    # fake)
     self.temperature = 1.0  # temperature for sampling from generator
 
     # batch sizes
@@ -88,9 +89,12 @@ class PretrainingConfig(object):
     self.tpu_zone = None  # GCE zone where the Cloud TPU is located in
     self.gcp_project = None  # project name for the Cloud TPU-enabled project
 
+    #multi gpus
+    self.use_multi_gpu = False
+
     # default locations of data files
     self.pretrain_tfrecords = os.path.join(
-        data_dir, "pretrain_tfrecords/pretrain_data.tfrecord*")
+      data_dir, "pretrain_tfrecords/pretrain_data.tfrecord*")
     self.vocab_file = os.path.join(data_dir, "vocab.txt")
     self.model_dir = os.path.join(data_dir, "models", model_name)
     results_dir = os.path.join(self.model_dir, "results")
@@ -130,6 +134,15 @@ class PretrainingConfig(object):
 
     # passed-in-arguments override (for example) debug-mode defaults
     self.update(kwargs)
+
+    if self.use_multi_gpu:
+      hvd.init()
+      print("hvd rank {}".format(hvd.rank()))
+      print("hvd size {}".format(hvd.size()))
+      self.model_dir = self.model_dir if hvd.rank() == 0 else os.path.join(self.model_dir, str(hvd.rank()))
+      self.num_train_steps = self.num_train_steps // hvd.size()
+      self.num_warmup_steps = self.num_warmup_steps // hvd.size()
+
 
   def update(self, kwargs):
     for k, v in kwargs.items():
