@@ -25,10 +25,11 @@ from __future__ import print_function
 import collections
 import re
 import tensorflow.compat.v1 as tf
+import horovod.tensorflow as hvd
 
 
 def create_optimizer(
-    loss, learning_rate, num_train_steps, weight_decay_rate=0.0, use_tpu=False,
+    loss, learning_rate, num_train_steps, weight_decay_rate=0.0, use_tpu=False, use_multi_gpu=False,
     warmup_steps=0, warmup_proportion=0, lr_decay_power=1.0,
     layerwise_lr_decay_power=-1, n_transformer_layers=None):
   """Creates an optimizer and training op."""
@@ -54,6 +55,10 @@ def create_optimizer(
       beta_2=0.999,
       epsilon=1e-6,
       exclude_from_weight_decay=["LayerNorm", "layer_norm", "bias"])
+
+  if use_multi_gpu:
+      optimizer = hvd
+
   if use_tpu:
     optimizer = tf.tpu.CrossShardOptimizer(optimizer)
 

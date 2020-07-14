@@ -1,0 +1,10 @@
+{
+  "tpu_name": "electra-small",
+  "vocab_size": 30000,
+  "num_train_steps": 375000,
+  "save_checkpoints_steps": 18750,
+  "learning_rate": 5e-4,
+  "max_seq_length": 128,
+  "generator_hidden_size": 1.0,
+  "train_batch_size" : 128
+}
