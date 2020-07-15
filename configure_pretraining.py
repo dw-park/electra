@@ -137,8 +137,6 @@ class PretrainingConfig(object):
 
     if self.use_multi_gpu:
       hvd.init()
-      print("hvd rank {}".format(hvd.rank()))
-      print("hvd size {}".format(hvd.size()))
       self.model_dir = self.model_dir if hvd.rank() == 0 else os.path.join(self.model_dir, str(hvd.rank()))
       self.num_train_steps = self.num_train_steps // hvd.size()
       self.num_warmup_steps = self.num_warmup_steps // hvd.size()
