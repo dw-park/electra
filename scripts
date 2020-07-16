@@ -1,3 +1,6 @@
-python3 build_pretraining_dataset.py --corpus-dir /NAS_data/dwpark/corpus/splited_morphs/total/ --vocab-file ./vocab.txt --output-dir ./pretrain_examples --max-seq-length 128 --num-processes 36 --blanks-separate-docs False --do-lower-case
+python3 build_pretraining_dataset.py --corpus-dir /NAS_data/dwpark/corpus/splited/ --vocab-file /NAS_data/dwpark/corpus/models/tokenizer/enliple/vocab.txt --output-dir ./pretrain_examples --max-seq-length 512 --num-processes 36 --blanks-separate-docs True --no-lower-case
 
  python3 run_pretraining.py --data-dir /dwpark/projects/google_research_electra/ --model-name ./output_small --hparams config/small_config.json
+
+horovodrun -np 4 -H localhost:4 python3 run_pretraining.py --data-dir /dwpark/projects/google_research_electra/ --model-name ./output_small_distrib --hparams config/small_config.json |& grep -v "Read -1"
+
