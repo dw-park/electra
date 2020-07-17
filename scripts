@@ -4,5 +4,21 @@ python3 build_pretraining_dataset.py --corpus-dir /NAS_data/dwpark/corpus/splite
 
 horovodrun -np 4 -H localhost:4 python3 run_pretraining.py --data-dir /dwpark/projects/google_research_electra/ --model-name ./output_small_distrib --hparams config/small_config.json |& grep -v "Read -1"
 
-horovodrun -np 8 -H 10.0.0.92:4 10.0.0.93:4 python3 run_pretraining.py --data-dir /dwpark/projects/google_research_electra/ --model-name ./output_small_distrib --hparams config/small_config.json |& grep -v "Read -1"
+
+host에서
+horovodrun --network-interface enp2s0f0 -p 12345 -np 8 -H 10.0.0.92:4,10.0.0.93:4 python3 run_pretraining.py --data-dir /dwpark/projects/google_research_electra/ --model-name ./output_small_distrib --hparams config/small_config.json
+
+slave에서
+bash -c "/usr/sbin/sshd -p 12345; sleep infinity"
+
+mpirun -np 8 \
+    -H 10.0.0.92:4,10.0.0.93:4 \
+    --allow-run-as-root \
+    -bind-to none -map-by slot \
+    -x NCCL_DEBUG=INFO -x LD_LIBRARY_PATH -x PATH \
+    -x NCCL_SOCKET_IFNAME=^lo,docker0 \
+    -mca plm_rsh_args "-p 30022" \
+    -mca pml ob1 -mca btl ^openib \
+    -mca btl_tcp_if_exclude lo,docker0 \
+    python3 run_pretraining.py --data-dir /dwpark/projects/google_research_electra/ --model-name ./output_small_distrib --hparams config/small_config.json |& grep -v "Read -1"
 
