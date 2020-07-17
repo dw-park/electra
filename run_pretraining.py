@@ -367,10 +367,6 @@ def train_or_eval(config: configure_pretraining.PretrainingConfig):
         utils.heading("Running training")
 
         if config.use_multi_gpu:
-            print(config.use_multi_gpu)
-            print(config.use_multi_gpu)
-            print(config.use_multi_gpu)
-
             hooks = [hvd.BroadcastGlobalVariablesHook(0)]
         else:
             hooks = []

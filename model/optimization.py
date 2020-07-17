@@ -49,8 +49,8 @@ def create_optimizer(
         learning_rate = _get_layer_lrs(learning_rate, layerwise_lr_decay_power,
                                        n_transformer_layers)
 
-    if use_multi_gpu:
-        learning_rate = learning_rate * hvd.size()
+    # if use_multi_gpu:
+    #     learning_rate = learning_rate * hvd.size()
 
     optimizer = AdamWeightDecayOptimizer(
         learning_rate=learning_rate,

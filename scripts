@@ -4,3 +4,5 @@ python3 build_pretraining_dataset.py --corpus-dir /NAS_data/dwpark/corpus/splite
 
 horovodrun -np 4 -H localhost:4 python3 run_pretraining.py --data-dir /dwpark/projects/google_research_electra/ --model-name ./output_small_distrib --hparams config/small_config.json |& grep -v "Read -1"
 
+horovodrun -np 8 -H 10.0.0.92:4 10.0.0.93:4 python3 run_pretraining.py --data-dir /dwpark/projects/google_research_electra/ --model-name ./output_small_distrib --hparams config/small_config.json |& grep -v "Read -1"
+
