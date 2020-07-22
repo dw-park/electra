@@ -1,0 +1,17 @@
+{
+  "tpu_name": "electra-base",
+  "vocab_size": 32200,
+  "num_train_steps": 300000,
+  "save_checkpoints_steps": 18750,
+  "learning_rate": 2e-4,
+  "max_seq_length": 128,
+  "generator_hidden_size": 0.33333,
+  "train_batch_size" : 64,
+  "vocab_file" : "/NAS_data/dwpark/corpus/models/tokenizer/enliple/vocab.txt",
+  "use_multi_gpu" : true,
+  "embedding_size" : 768,
+  "do_lower_case" : false,
+  "model_size" : "base"
+
+
+}
