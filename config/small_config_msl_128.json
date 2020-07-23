@@ -9,6 +9,6 @@
   "train_batch_size" : 256,
   "vocab_file" : "/NAS_data/dwpark/corpus/models/tokenizer/enliple/vocab.txt",
   "use_multi_gpu" : true,
-  "model_size" : "base"
-
+  "model_size" : "small",
+  "do_lower_case" : false
 }
